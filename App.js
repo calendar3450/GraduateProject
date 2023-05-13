@@ -1,44 +1,80 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { Fontisto } from '@expo/vector-icons';
 
 export default function App() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [breed, setBreed] = useState('');
+  const [gender, setGender] = useState('');
+  const [birth, setBirth] = useState('');
 
-  const handleLogin = async () => {
-    const user = await AsyncStorage.getItem(username);
-    if (user !== null && JSON.parse(user).password === password) {
-      alert('로그인 성공!');
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('breed', breed);
+    formData.append('gender', gender);
+    formData.append('birth', birth);
+
+    const response = await fetch('http://localhost:5000/submit-form', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      console.log('Form submitted successfully!');
     } else {
-      alert('아이디 또는 비밀번호가 틀렸습니다.');
+      console.log('Error submitting form');
     }
-  };
-
-  const handleSignUp = async () => {
-    const user = { username, password };
-    await AsyncStorage.setItem(username, JSON.stringify(user));
-    alert('회원가입이 완료되었습니다.');
   };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="아이디"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="비밀번호"
-        value={password}
-        secureTextEntry={true}
-        onChangeText={setPassword}
-      />
-      <Button title="로그인" onPress={handleLogin} />
-      <Button title="회원가입" onPress={handleSignUp} />
+      <Text style={styles.title}>Pet Information</Text>
+
+      <View style={styles.inputContainer}>
+        <Fontisto name="paw" size={26} color="black" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="이름"
+          value={name}
+          onChangeText={setName}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <AntDesign name="pushpin" size={28} color="black" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="품종"
+          value={breed}
+          onChangeText={setBreed}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <AntDesign name="heart" size={28} color="black" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="성별"
+          value={gender}
+          onChangeText={setGender}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <AntDesign name="notification" size={28} color="black" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="생일"
+          value={birth}
+          onChangeText={setBirth}
+        />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>등  록</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -46,17 +82,41 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  icon: {
+    marginRight: 10,
   },
   input: {
-    width: '100%',
-    height: 50,
+    flex: 0.8,
+    height: 40,
+    borderColor: 'gray',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: 'blue',
     padding: 10,
-    marginBottom: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
