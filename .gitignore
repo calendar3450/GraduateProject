@@ -1,1 +1,6 @@
 .DS_Store
+.env
+# compiled output
+/BackEnd/nest/dist
+/BackEnd/nest/node_modules
+/BackEnd/Django/PetDiagnosis/test_model.h5
