@@ -11,7 +11,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validate(userId: string, token: string) {
+  async validateByRefreshToken(userId: string, token: string) {
     const user = await this.usersService.findById(userId);
 
     if (!user) {

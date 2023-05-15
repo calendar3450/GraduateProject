@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 import { API_URL } from "../utils/common";
 
-const SignUpScreen = ({ navigation }) => {
+const SignUpPage = ({ navigation }) => {
   const [id, setId] = useState("");
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignUpScreen;
+export default SignUpPage;

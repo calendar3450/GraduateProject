@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "../utils/common";
 
-export default function DiagnosisList({ navigation }) {
+export default function DiagnosisListPage({ navigation }) {
   const [diagnosisList, setDiagnosisList] = useState([]);
   const [error, setError] = useState(null);
 
@@ -43,7 +43,6 @@ export default function DiagnosisList({ navigation }) {
           return { ...obj, diagnosisResult: res.data.data };
         })
       );
-      console.log(updatedDiagnosisListData);
 
       // set the updated diagnosis list data
       setDiagnosisList(updatedDiagnosisListData);

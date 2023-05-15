@@ -20,7 +20,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
       ignoreExpiration: false,
     });
   }
-  async refresh_validate(req: Request, payload: Payload) {
+  async validate(req: Request, payload: Payload) {
     const refreshToken = req.get('authorization').split('Bearer ')[1];
     const user = await this.userService.findById(payload.sub);
     const userName = user.userName;

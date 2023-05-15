@@ -3,7 +3,6 @@ import { View, TextInput, StyleSheet } from "react-native";
 import { Button, Text } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
 import { API_URL } from "../utils/common";
 
 export default function LoginPage({ navigation }) {
@@ -29,8 +28,6 @@ export default function LoginPage({ navigation }) {
       });
       const { access_token, refresh_token, userName } = response.data.data;
 
-      console.log(userName);
-
       await AsyncStorage.setItem("userName", JSON.stringify({ userName }));
 
       await AsyncStorage.setItem(
@@ -39,7 +36,7 @@ export default function LoginPage({ navigation }) {
       );
       setUserId("");
       setPassword("");
-      navigation.navigate("PetDataPage");
+      navigation.navigate("HomePage");
     } catch (error) {
       console.log(error);
       setUserId("");
@@ -81,14 +78,6 @@ export default function LoginPage({ navigation }) {
         buttonStyle={styles.button}
         onPress={() => navigation.navigate("SignupPage")}
       />
-
-      <View style={styles.bottomContainer}>
-        <Button
-          title="이미지 입력"
-          type="clear"
-          onPress={() => navigation.navigate("ImageInput")}
-        />
-      </View>
     </View>
   );
 }

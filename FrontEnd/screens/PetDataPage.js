@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet } from "react-native";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import jwtDecode from "jwt-decode";
 import { API_URL } from "../utils/common";
 
 export default function PetDataPage({ navigation }) {
@@ -16,21 +17,33 @@ export default function PetDataPage({ navigation }) {
     let accessToken;
     if (tokens !== null) {
       const { access_token } = JSON.parse(tokens);
-      accessToken = access_token;
-      console.log(accessToken);
+      const decodedToken = jwtDecode(access_token);
+
+      try {
+        // 토큰이 만료되었는지 확인
+        if (decodedToken.exp < Date.now() / 1000) {
+          // 토큰이 만료되었을 경우
+          const { refresh_token } = JSON.parse(tokens);
+          const response = await axios.get(`${API_URL}/user/getAccessToken`, {
+            headers: {
+              Authorization: `Bearer ${refresh_token}`,
+            },
+          });
+          const { access_token } = response.data.data;
+          await AsyncStorage.setItem(
+            "tokens",
+            JSON.stringify({ access_token, refresh_token })
+          );
+          console.log("access_token 기간 만료 재발급 시행");
+        } else {
+          accessToken = access_token;
+        }
+      } catch (error) {
+        console.log(error.response.data);
+      }
     } else {
-      const { refresh_token } = JSON.parse(tokens);
-      const response = await axios.get(`${API_URL}/user/getAccessToken`, {
-        headers: {
-          Authorization: `Bearer ${refresh_token}`,
-        },
-      });
-      const { access_token } = response.data.data;
-      await AsyncStorage.setItem(
-        "tokens",
-        JSON.stringify({ access_token, refresh_token })
-      );
-      console.log("access_token 기간 만료 재발급 시행");
+      alert("시스템 오류 다시 로그인해주시기 바랍니다.");
+      navigation.navigate("LoginPage");
     }
     try {
       const response = await axios.post(
@@ -54,7 +67,7 @@ export default function PetDataPage({ navigation }) {
       setBreed("");
       setGender("");
       setPetName("");
-      navigation.navigate("ImageInput");
+      navigation.navigate("ImageInputPage");
     } catch (error) {
       console.log(error.response.data);
       setAge("");

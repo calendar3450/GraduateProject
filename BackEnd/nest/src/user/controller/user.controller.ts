@@ -95,7 +95,7 @@ export class UserController {
   async issueByRefreshToken(@Req() req: Request) {
     const token = req.user['refreshToken'];
     const userName = req.user['userName'];
-    return await this.authService.validate(userName, token);
+    return await this.authService.validateByRefreshToken(userName, token);
   }
 
   @ApiOperation({ summary: 'DB 모든 정보 가져오기' })

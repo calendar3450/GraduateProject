@@ -87,6 +87,10 @@ export class DiagnosisService {
       where: { petId },
       order: { createdAt: 'DESC' },
     });
-    return findDiagnosisResult.diagnosis;
+    if (findDiagnosisResult && findDiagnosisResult.diagnosis) {
+      return findDiagnosisResult.diagnosis;
+    } else {
+      return '진단 결과를 찾을 수 없습니다.';
+    }
   }
 }
