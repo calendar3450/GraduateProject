@@ -26,7 +26,7 @@ export default function DiagnosisListPage({ navigation }) {
       }
       console.log(`userName - ${obj_userName}`);
       // call your API endpoint to get the diagnosis list
-      const response = await axios.post(`${API_URL}/diagnosis/findPetData`, {
+      const response = await axios.post(`${API_URL}/diagnosis/findAllPetData`, {
         author: obj_userName,
       });
       const diagnosisListData = response.data.data;

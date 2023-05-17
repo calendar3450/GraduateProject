@@ -14,7 +14,10 @@ import {
 
 @Entity({ name: 'Pet' })
 export class Pet {
-  @ApiProperty({})
+  @ApiProperty({
+    example: 'Pet Id',
+    description: 'uuid',
+  })
   @IsString()
   @PrimaryGeneratedColumn('uuid')
   petId: string;
@@ -27,7 +30,10 @@ export class Pet {
   @Column({ type: 'varchar', nullable: false })
   petName: string;
 
-  @ApiProperty({})
+  @ApiProperty({
+    example: '견종',
+    description: '웰시코기',
+  })
   @IsString()
   @Column({ type: 'varchar', nullable: false })
   breed: string;
@@ -55,6 +61,9 @@ export class Pet {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ApiProperty({
+    example: '홍길동',
+  })
   @ManyToOne(() => User, (user) => user.userName)
   @JoinColumn({ name: 'userName' })
   author: User;

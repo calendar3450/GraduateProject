@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Diagnosis, Pet } from '../entities/diagnosis.entity';
 import axios from 'axios';
+import { InputPetIdDto } from '../dtos/create-inputPetId.dto';
+import { CreatePetDataDto } from '../dtos/create-petData.dto';
 
 @Injectable()
 export class DiagnosisService {
@@ -13,7 +15,7 @@ export class DiagnosisService {
     private diagnosisRepository: Repository<Diagnosis>,
   ) {}
 
-  async savePetData(author: any, body: any) {
+  async savePetData(author: any, body: CreatePetDataDto) {
     const { petName, breed, age, gender } = body;
 
     const petData = await this.petRepository.save({
@@ -28,7 +30,7 @@ export class DiagnosisService {
     };
   }
 
-  async savedResult(_id: any, files: Express.Multer.File[]) {
+  async savedResult(_id: InputPetIdDto, files: Express.Multer.File[]) {
     const { petId } = _id;
 
     await this.diagnosisRepository.save({ petId });
@@ -72,7 +74,7 @@ export class DiagnosisService {
     return res;
   }
 
-  async findDiagnosis(body: any) {
+  async findByUserName(body: any) {
     const { author } = body;
     const findData = await this.petRepository.find({
       where: { author: { userName: author } },
@@ -81,7 +83,7 @@ export class DiagnosisService {
     return findData;
   }
 
-  async findPetIdResult(body: any) {
+  async findPetIdResult(body: InputPetIdDto) {
     const { petId } = body;
     const findDiagnosisResult = await this.diagnosisRepository.findOne({
       where: { petId },

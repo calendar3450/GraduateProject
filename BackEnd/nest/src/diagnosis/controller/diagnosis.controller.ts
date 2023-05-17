@@ -19,10 +19,11 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/common/utils/multer.options';
 import { CreatePetDataDto } from '../dtos/create-petData.dto';
-import { CreateDiagnosisImgDto } from '../dtos/create-diagnosisImg.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/accesstoken.guard';
 import { CurrentUser } from 'src/common/decorator/custom.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { InputPetIdDto } from '../dtos/create-inputPetId.dto';
+import { InputUserNameDto } from '../dtos/create-inputUserName.dts';
 
 @Controller('diagnosis')
 @ApiTags('Diagnosis')
@@ -75,21 +76,61 @@ export class DiagnosisController {
   @UseInterceptors(FilesInterceptor('image', 1, multerOptions('petEye')))
   @Post('diagnosisImg')
   async diagnosisImg(
-    @Body() body: CreateDiagnosisImgDto,
+    @Body() body: InputPetIdDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     return await this.diagnosisService.savedResult(body, files);
   }
 
   @ApiOperation({ summary: '회원의 모든 진단 결과 이력 출력' })
-  @Post('findPetData')
-  findPetData(@Body() body: any) {
-    return this.diagnosisService.findDiagnosis(body);
+  @ApiResponse({
+    status: 500,
+    description: 'Server error...',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '회원의 모든 진단결과 반환',
+    schema: {
+      example: {
+        success: true,
+        data: [
+          {
+            petId: '92ebf761-68...',
+            petName: '초코',
+            breed: '푸들',
+            age: 10,
+            gender: '수컷',
+            createdAt: '2023-05-14T12:04:50.410Z',
+            updatedAt: '2023-05-14T12:04:50.410Z',
+          },
+        ],
+      },
+    },
+  })
+  @Post('findAllPetData')
+  findAllPetData(@Body() body: InputUserNameDto) {
+    return this.diagnosisService.findByUserName(body);
   }
 
-  @ApiOperation({ summary: 'petId를 통해 진단 결과 출력' })
+  @ApiOperation({ summary: 'petId를 통한 진단 결과 출력' })
+  @ApiResponse({
+    status: 500,
+    description: 'Server error...',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '진단결과 반환',
+    schema: {
+      example: {
+        success: true,
+        data: {
+          result: '무증상',
+        },
+      },
+    },
+  })
   @Post('findDiagnosisByPetId')
-  findPetIdResult(@Body() body: any) {
+  findPetIdResult(@Body() body: InputPetIdDto) {
     return this.diagnosisService.findPetIdResult(body);
   }
 }
