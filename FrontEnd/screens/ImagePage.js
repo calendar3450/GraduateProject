@@ -57,7 +57,7 @@ export default function ImageInputPage({ navigation }) {
       );
       console.log(response.data.data);
       alert(`진단결과: ${response.data.data.result}!`);
-      navigation.navigate("DiagnosisListPage");
+      navigation.navigate("HomePage");
     } catch (error) {
       console.log(error.response.data);
       alert("진단에 실패하였습니다 다시 시도해주세요!");
@@ -66,7 +66,7 @@ export default function ImageInputPage({ navigation }) {
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      <Button title="진단할 이미지 파일을 선택하시오." onPress={pickImage} />
       {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
       )}

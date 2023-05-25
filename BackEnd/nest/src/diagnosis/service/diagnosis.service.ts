@@ -37,7 +37,7 @@ export class DiagnosisService {
 
     const fileName = `petEye/${files[0].filename}`;
 
-    const imgUrl = `http://localhost:3000/media/${fileName}`;
+    const imgUrl = `${process.env.NEST_URI}/media/${fileName}`;
 
     const saved = await this.diagnosisRepository.update(
       {
@@ -46,7 +46,7 @@ export class DiagnosisService {
       { imgUrl },
     );
 
-    const url = `http://127.0.0.1:8000/diagnosis/dog/`;
+    const url = `${process.env.DJANGO_URI}`;
 
     if (saved.affected == 0) {
       throw new BadRequestException('해당하는 펫 아이디를 찾을 수 없습니다.');

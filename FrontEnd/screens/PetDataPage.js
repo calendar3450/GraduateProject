@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -11,6 +17,15 @@ export default function PetDataPage({ navigation }) {
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
+
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("focus", () => {
+  //     // 홈 페이지가 포커스를 받았을 때 데이터를 업데이트
+  //     //loadUserName();
+  //   });
+
+  //   return unsubscribe;
+  // }, [navigation]);
 
   const handleCreatePet = async () => {
     const tokens = await AsyncStorage.getItem("tokens");
@@ -65,17 +80,19 @@ export default function PetDataPage({ navigation }) {
       alert("반려동물 정보 등록 성공!");
       setAge("");
       setBreed("");
-      setGender("");
       setPetName("");
       navigation.navigate("ImageInputPage");
     } catch (error) {
       console.log(error.response.data);
       setAge("");
       setBreed("");
-      setGender("");
       setPetName("");
       alert("반려동물 정보 등록 실패!");
     }
+  };
+
+  const handleGenderSelect = (selected) => {
+    setGender(selected);
   };
 
   return (
@@ -98,12 +115,26 @@ export default function PetDataPage({ navigation }) {
         value={age}
         onChangeText={setAge}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="성별"
-        value={gender}
-        onChangeText={setGender}
-      />
+      <View style={styles.genderContainer}>
+        <TouchableOpacity
+          style={[
+            styles.genderButton,
+            gender === "수컷" ? styles.genderButtonSelected : null,
+          ]}
+          onPress={() => handleGenderSelect("수컷")}
+        >
+          <Text style={styles.genderButtonText}>수컷</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.genderButton,
+            gender === "암컷" ? styles.genderButtonSelected : null,
+          ]}
+          onPress={() => handleGenderSelect("암컷")}
+        >
+          <Text style={styles.genderButtonText}>암컷</Text>
+        </TouchableOpacity>
+      </View>
       <Button title="반려동물 정보 등록" onPress={handleCreatePet} />
     </View>
   );
@@ -124,5 +155,26 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
+  },
+  genderContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  genderButton: {
+    flex: 1,
+    padding: 20,
+    margin: 10,
+    borderRadius: 10,
+    backgroundColor: "#ccc",
+  },
+  genderButtonText: {
+    color: "black", // 원하는 색상으로 변경해주세요
+    fontSize: 16, // 원하는 글꼴 크기로 변경해주세요
+    fontWeight: "bold", // 원하는 글꼴 굵기로 변경해주세요
+    textAlign: "center",
+  },
+  genderButtonSelected: {
+    backgroundColor: "#007AFF",
   },
 });
