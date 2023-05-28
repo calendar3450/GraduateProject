@@ -43,7 +43,6 @@ export default function DiagnosisListPage({ navigation }) {
           return { ...obj, diagnosisResult: res.data.data };
         })
       );
-
       // set the updated diagnosis list data
       setDiagnosisList(updatedDiagnosisListData);
     } catch (error) {

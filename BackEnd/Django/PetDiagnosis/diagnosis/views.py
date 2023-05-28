@@ -34,9 +34,10 @@ def dog_diagnosis(request):
         try:
             req = json.loads(request.body)
             imgUrl = req['img']
+            print(imgUrl)
             res = requests.get(imgUrl).content
             img = Image.open(BytesIO(res)).resize((224, 224)).convert('RGB')
-            result = predict_dog_disease(img)
+            result = predict_dog_disease_top3(img)
             return JsonResponse({'result': result})
         except KeyError:
             return JsonResponse({'error': 'imgUrl not provided'}, status=400)
@@ -50,7 +51,7 @@ def none_user_dog_diagnosis(request):
         try:
             image_file = request.FILES['img']
             img = Image.open(image_file).resize((224, 224)).convert('RGB')
-            result = predict_dog_disease(img)
+            result = predict_dog_disease_top3(img)
             return JsonResponse({'result': result})
         except KeyError:
             return JsonResponse({'error': 'No image provided'}, status=400)
@@ -71,3 +72,23 @@ def predict_dog_disease(img):
         result = x
         break
     return result
+
+def predict_dog_disease_top3(img):
+    img = img_to_array(img)
+    img = img.reshape((1, img.shape[0], img.shape[1], img.shape[2]))
+    img = preprocess_input(img)
+    prediction = model.predict(img)
+    df = pd.DataFrame({'pred':prediction[0]})
+    df = df.sort_values(by='pred', ascending=False, na_position='first')
+
+    top3_result = []
+    for i in range(3):
+        for x in class_dictionary:
+            if class_dictionary[x] == (df[df == df.iloc[i]].index[i]):
+                top3_result.append(x)
+                break
+    # 배열 요소를 형식에 맞게 변환하여 새로운 배열 생성
+    formatted_array = [f"{index+1}. {item}" for index, item in enumerate(top3_result)]
+    # 배열을 문자열로 변환
+    formatted_string = " ".join(formatted_array)
+    return formatted_string

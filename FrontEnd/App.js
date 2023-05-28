@@ -18,10 +18,10 @@ function App() {
   React.useEffect(() => {
     const hideSplashScreen = async () => {
       await SplashScreen.preventAutoHideAsync();
-      // 3초간 대기
+      // 1초간 대기
       setTimeout(async () => {
         await SplashScreen.hideAsync();
-      }, 3000);
+      }, 1000);
     };
 
     hideSplashScreen();
@@ -30,17 +30,41 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="OnboardingPage" component={OnboardingPage} />
-        <Stack.Screen name="HomePage" component={HomePage} />
-        <Stack.Screen name="LoginPage" component={LoginPage} />
-        <Stack.Screen name="PetDataPage" component={PetDataPage} />
-        <Stack.Screen name="SignupPage" component={SignUpPage} />
-        <Stack.Screen name="ImageInputPage" component={ImageInputPage} />
+        <Stack.Screen
+          name="OnboardingPage"
+          component={OnboardingPage}
+          options={{ headerTitle: "서비스 선택" }}
+        />
+        <Stack.Screen
+          name="HomePage"
+          component={HomePage}
+          options={{ headerTitle: "홈 화면" }}
+        />
+        <Stack.Screen
+          name="LoginPage"
+          component={LoginPage}
+          options={{ headerTitle: "로그인 화면" }}
+        />
+        <Stack.Screen
+          name="PetDataPage"
+          component={PetDataPage}
+          options={{ headerTitle: "정보 입력 화면" }}
+        />
+        <Stack.Screen
+          name="SignupPage"
+          component={SignUpPage}
+          options={{ headerTitle: "회원가입 화면" }}
+        />
+        <Stack.Screen
+          name="ImageInputPage"
+          component={ImageInputPage}
+          options={{ headerTitle: "진단 화면" }}
+        />
         <Stack.Screen
           name="DiagnosisListPage"
           component={DiagnosisListPage}
           options={({ navigation }) => ({
-            title: "Diagnosis List",
+            title: "진단 기록 화면",
             headerRight: () => (
               <IconButton
                 icon="home"
@@ -49,7 +73,11 @@ function App() {
             ),
           })}
         />
-        <Stack.Screen name="NoneMemberPage" component={NoneMemberPage} />
+        <Stack.Screen
+          name="NoneMemberPage"
+          component={NoneMemberPage}
+          options={{ headerTitle: "진단 화면" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

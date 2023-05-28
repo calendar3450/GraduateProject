@@ -1,6 +1,11 @@
 import React, { useState } from "react";
-import { View, TextInput, StyleSheet } from "react-native";
-import { Button, Text } from "react-native-elements";
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "../utils/common";
@@ -36,7 +41,7 @@ export default function LoginPage({ navigation }) {
       );
       setUserId("");
       setPassword("");
-      navigation.navigate("HomePage");
+      navigation.replace("HomePage");
     } catch (error) {
       console.log(error);
       setUserId("");
@@ -68,16 +73,21 @@ export default function LoginPage({ navigation }) {
         />
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button
-        title="로그인"
-        buttonStyle={styles.button}
-        onPress={handleLogin}
-      />
-      <Button
-        title="회원가입"
-        buttonStyle={styles.button}
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>로그인</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
         onPress={() => navigation.navigate("SignupPage")}
-      />
+      >
+        <Text style={styles.buttonText}>회원가입</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("NoneMemberPage")}
+      >
+        <Text style={styles.buttonText}>비회원</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -103,12 +113,20 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 10,
     backgroundColor: "#7c7bad",
-    borderRadius: 10,
-    width: "100%",
+    borderRadius: 20,
+    justifyContent: "center",
+    height: 30,
+    width: 150,
   },
   bottomContainer: {
     width: "100%",
     padding: 30,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   error: {
     color: "red",

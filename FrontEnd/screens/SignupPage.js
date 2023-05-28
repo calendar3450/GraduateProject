@@ -45,7 +45,7 @@ const SignUpPage = ({ navigation }) => {
       setPassword("");
       setUsername("");
       setConfirmPassword("");
-      navigation.navigate("LoginPage");
+      navigation.replace("LoginPage");
     } catch (error) {
       setId("");
       setPassword("");

@@ -11,11 +11,11 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateByRefreshToken(userId: string, token: string) {
-    const user = await this.usersService.findById(userId);
+  async validateByRefreshToken(userName: string, token: string) {
+    const user = await this.usersService.findByUserName(userName);
 
     if (!user) {
-      throw new UnauthorizedException('id가 존재하지 않습니다');
+      throw new UnauthorizedException('유저 네임이 존재하지 않습니다');
     }
 
     if (token !== user.refreshToken) {

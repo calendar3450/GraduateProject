@@ -4,9 +4,9 @@ import {
   Text,
   TextInput,
   StyleSheet,
+  Alert,
   TouchableOpacity,
 } from "react-native";
-import { Button } from "react-native-elements";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
@@ -17,15 +17,6 @@ export default function PetDataPage({ navigation }) {
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
-
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener("focus", () => {
-  //     // 홈 페이지가 포커스를 받았을 때 데이터를 업데이트
-  //     //loadUserName();
-  //   });
-
-  //   return unsubscribe;
-  // }, [navigation]);
 
   const handleCreatePet = async () => {
     const tokens = await AsyncStorage.getItem("tokens");
@@ -49,7 +40,7 @@ export default function PetDataPage({ navigation }) {
             "tokens",
             JSON.stringify({ access_token, refresh_token })
           );
-          console.log("access_token 기간 만료 재발급 시행");
+          accessToken = access_token;
         } else {
           accessToken = access_token;
         }
@@ -58,7 +49,7 @@ export default function PetDataPage({ navigation }) {
       }
     } else {
       alert("시스템 오류 다시 로그인해주시기 바랍니다.");
-      navigation.navigate("LoginPage");
+      navigation.replace("LoginPage");
     }
     try {
       const response = await axios.post(
@@ -77,17 +68,16 @@ export default function PetDataPage({ navigation }) {
       );
       const { petId } = response.data.data;
       await AsyncStorage.setItem("petId", JSON.stringify({ petId }));
-      alert("반려동물 정보 등록 성공!");
+      Alert.alert("성 공!", "진단 화면으로 전환됩니다.");
       setAge("");
       setBreed("");
       setPetName("");
       navigation.navigate("ImageInputPage");
     } catch (error) {
-      console.log(error.response.data);
       setAge("");
       setBreed("");
       setPetName("");
-      alert("반려동물 정보 등록 실패!");
+      Alert.alert("입력 정보 오류", "반려동물 정보 등록을 다시 시도해주세요.");
     }
   };
 
@@ -97,6 +87,9 @@ export default function PetDataPage({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.greeting}>
+        진단할 반려견의 정보를 입력하여주세요!
+      </Text>
       <TextInput
         style={styles.input}
         placeholder="펫이름"
@@ -135,7 +128,9 @@ export default function PetDataPage({ navigation }) {
           <Text style={styles.genderButtonText}>암컷</Text>
         </TouchableOpacity>
       </View>
-      <Button title="반려동물 정보 등록" onPress={handleCreatePet} />
+      <TouchableOpacity style={[styles.button]} onPress={handleCreatePet}>
+        <Text style={styles.buttonText}>반려동물 정보 등록하기</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -147,8 +142,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  greeting: {
+    fontSize: 20,
+    marginBottom: 40,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  button: {
+    backgroundColor: "#ccc",
+    borderRadius: 10,
+    paddingVertical: 10,
+    width: "95%",
+    height: 80,
+    marginBottom: 30,
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   input: {
-    width: "100%",
+    width: "95%",
     height: 50,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -159,7 +175,7 @@ const styles = StyleSheet.create({
   genderContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 5,
   },
   genderButton: {
     flex: 1,
@@ -169,12 +185,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
   genderButtonText: {
-    color: "black", // 원하는 색상으로 변경해주세요
+    color: "white", // 원하는 색상으로 변경해주세요
     fontSize: 16, // 원하는 글꼴 크기로 변경해주세요
     fontWeight: "bold", // 원하는 글꼴 굵기로 변경해주세요
     textAlign: "center",
   },
   genderButtonSelected: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7c7bad",
   },
 });

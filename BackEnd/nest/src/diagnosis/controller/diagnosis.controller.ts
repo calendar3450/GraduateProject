@@ -2,7 +2,7 @@ import {
   Body,
   Controller,
   Post,
-  UploadedFiles,
+  UploadedFile,
   UseFilters,
   UseGuards,
   UseInterceptors,
@@ -16,8 +16,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { multerOptions } from 'src/common/utils/multer.options';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreatePetDataDto } from '../dtos/create-petData.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/accesstoken.guard';
 import { CurrentUser } from 'src/common/decorator/custom.decorator';
@@ -73,13 +72,15 @@ export class DiagnosisController {
       },
     },
   })
-  @UseInterceptors(FilesInterceptor('image', 1, multerOptions('petEye')))
+  @UseInterceptors(FileInterceptor('image'))
   @Post('diagnosisImg')
   async diagnosisImg(
     @Body() body: InputPetIdDto,
-    @UploadedFiles() files: Array<Express.Multer.File>,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return await this.diagnosisService.savedResult(body, files);
+    const { key } = await this.diagnosisService.uploadFileToS3('petEye', file);
+    const url = this.diagnosisService.getAwsS3FileUrl(key);
+    return await this.diagnosisService.savedUrlAndDiagnosis(body, url);
   }
 
   @ApiOperation({ summary: '회원의 모든 진단 결과 이력 출력' })
