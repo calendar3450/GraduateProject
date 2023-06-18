@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
+  Platform,
+  ActionSheetIOS,
   Text,
   View,
+  StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
@@ -10,14 +13,16 @@ import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "../utils/common";
-import Modal from "react-native-modal";
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
+import UploadModeModal from "../utils/modal";
+import { LinearGradient } from "expo-linear-gradient";
+import { manipulateAsync } from "expo-image-manipulator";
 
 export default function ImageInputPage({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState(null);
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [cameraModalVisible, setCameraModalVisible] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState("");
   const [hasCameraPermission, setCameraPermission] = useState(null);
   const [camera, setCamera] = useState(null);
@@ -29,16 +34,47 @@ export default function ImageInputPage({ navigation }) {
   const windowHeight = Dimensions.get("window").height;
 
   const squareWidth = windowWidth * 0.7;
-  const squareHeight = windowHeight * 0.4;
+  const squareHeight = windowHeight * 0.3;
   const squareTop = windowHeight * 0.3;
   const squareLeft = windowWidth * 0.3;
 
   useEffect(() => {
-    (async () => {
+    const requestCameraPermission = async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setCameraPermission(status === "granted");
-    })();
-  }, []);
+    };
+
+    const focusListener = navigation.addListener("focus", () => {
+      modalOpen();
+    });
+
+    requestCameraPermission();
+
+    return () => {
+      focusListener.remove();
+    };
+  }, [navigation]);
+
+  const modalOpen = () => {
+    if (Platform.OS === "android") {
+      setCameraModalVisible(true);
+    } else {
+      setCameraModalVisible(true);
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ["카메라로 촬영하기", "사진 선택하기", "취소"],
+          cancelButtonIndex: 2,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            startCamera();
+          } else if (buttonIndex === 1) {
+            pickImage();
+          }
+        }
+      );
+    }
+  };
 
   const startCamera = () => {
     setShowCamera(true);
@@ -48,11 +84,49 @@ export default function ImageInputPage({ navigation }) {
     setIsCameraReady(true);
   };
 
+  const cropImage = async (photo) => {
+    if (!photo) {
+      return;
+    }
+
+    const cropWidth = photo.width / 2; // 크롭 영역의 너비
+    const cropHeight = photo.height / 2; // 크롭 영역의 높이
+
+    const originX = Math.max((photo.width - cropWidth) / 2, 0);
+    const originY = Math.max((photo.height - cropHeight) / 2, 0);
+
+    if (
+      originX + cropWidth > photo.width ||
+      originY + cropHeight > photo.height
+    ) {
+      console.log("크롭 영역이 원본 이미지를 벗어납니다.");
+      return; // 크롭 영역이 원본 이미지를 벗어나는 경우 처리
+    }
+
+    const croppedImage = await manipulateAsync(
+      photo.uri,
+      [
+        {
+          crop: {
+            originX,
+            originY,
+            width: cropWidth,
+            height: cropHeight,
+          },
+        },
+      ],
+      { compress: 1, format: "jpeg" }
+    );
+    return croppedImage;
+  };
+
   const takePicture = async () => {
     if (camera && isCameraReady) {
       const photo = await camera.takePictureAsync();
-      setImage(photo.uri);
-      uploadImage(photo.uri);
+      console.log("사진의 크기:", photo.width, "x", photo.height);
+      setImage(photo);
+      const croppedImg = await cropImage(photo);
+      uploadImage(croppedImg);
     }
   };
 
@@ -65,14 +139,16 @@ export default function ImageInputPage({ navigation }) {
       quality: 1,
     });
 
-    if (!result.cancelled) {
-      setImage(result.uri);
-      uploadImage(result.uri);
+    if (!result.canceled) {
+      setImage(result);
+      uploadImage(result);
     }
   };
 
-  const uploadImage = async (uri) => {
+  const uploadImage = async (photo) => {
     setIsLoading(true);
+
+    console.log(`크롭된 이미지: ${croppedImg.width}`);
 
     const petId = await AsyncStorage.getItem("petId");
     let obj_petId;
@@ -86,7 +162,7 @@ export default function ImageInputPage({ navigation }) {
     let formData = new FormData();
 
     formData.append("image", {
-      uri: uri,
+      uri: croppedImg.uri,
       type: "multipart/form-data",
       name: "image_test",
     });
@@ -109,13 +185,14 @@ export default function ImageInputPage({ navigation }) {
 
       setIsLoading(false);
       setDiagnosisResult(response.data.data.result);
-      setModalVisible(true);
+      const passedData = response.data.data.result;
+      navigation.replace("DiagnosisResultPage", { result: passedData });
     } catch (error) {
       setIsLoading(false);
+      console.log(error.response.data);
       alert(
         "진단에 실패하였습니다. 펫 정보를 다시 입력한 후 진단을 시작하세요!"
       );
-      navigation.navigate("PetDataPage");
     }
   };
 
@@ -136,191 +213,158 @@ export default function ImageInputPage({ navigation }) {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       {showCamera ? (
         <Camera
-          style={{ flex: 0.8, width: "100%" }}
+          style={styles.cameraContainer}
           type={Camera.Constants.Type.back}
           ref={(ref) => setCamera(ref)}
           onCameraReady={onCameraReady}
         >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "transparent",
-              flexDirection: "row",
-              borderRadius: 10,
-            }}
-          >
+          <View style={styles.camera}>
             <TouchableOpacity
-              style={{
-                flex: 1,
-                alignSelf: "flex-end",
-                alignItems: "center",
-              }}
+              style={styles.cameraButton}
               onPress={takePicture}
             ></TouchableOpacity>
           </View>
           <View
-            style={{
-              position: "absolute",
-              borderWidth: 2,
-              borderColor: "white",
-              borderRadius: 10,
-              top: squareTop,
-              left: squareLeft,
-              transform: [{ translateX: -50 }, { translateY: -100 }],
-              width: squareWidth,
-              height: squareHeight,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            style={[
+              styles.squareOverlay,
+              {
+                top: windowHeight * 0.3,
+                left: windowWidth * 0.3,
+                width: windowWidth * 0.7,
+                height: windowHeight * 0.3,
+              },
+            ]}
           >
-            <View
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: "transparent",
-                borderStyle: "dashed",
-                borderWidth: 2,
-                borderRadius: 10,
-                borderColor: "white",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: "white",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                }}
-              >
-                안구 범위
-              </Text>
+            <View style={styles.squareInnerOverlay}>
+              <Text style={styles.titleText}>안구 범위</Text>
             </View>
           </View>
         </Camera>
       ) : (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <TouchableOpacity
-            style={{
-              width: "50%",
-              backgroundColor: "#7c7bad",
-              padding: 10,
-              borderRadius: 10,
-              marginBottom: 20,
-            }}
-            onPress={startCamera}
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold",
-                fontSize: 16,
-              }}
-            >
-              On Camera
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              width: "50%",
-              backgroundColor: "#7c7bad",
-              padding: 10,
-              borderRadius: 10,
-              marginBottom: 20,
-            }}
-            onPress={pickImage}
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                color: "white",
-                fontWeight: "bold",
-                fontSize: 16,
-              }}
-            >
-              Select an image
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <UploadModeModal
+          visible={cameraModalVisible}
+          onClose={() => setCameraModalVisible(false)}
+          onLaunchCamera={startCamera}
+          onLaunchImageLibrary={pickImage}
+        />
       )}
 
       {showCamera && (
-        <View
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "30%",
-            bottom: 0,
-            backgroundColor: "#ccc",
-            alignItems: "center",
-            justifyContent: "center",
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          }}
-        >
-          <TouchableOpacity onPress={takePicture}>
-            <Ionicons name="camera" size={80} color="white" />
-          </TouchableOpacity>
+        <View style={styles.bottomView}>
+          <LinearGradient
+            style={StyleSheet.absoluteFill}
+            colors={["#7B68EE", "#9370DB"]}
+            start={{ x: 0, y: 1 }}
+            end={{ x: 1, y: 1 }}
+            borderTopLeftRadius={20}
+            borderTopRightRadius={20}
+          >
+            <TouchableOpacity onPress={takePicture}>
+              <Ionicons
+                name="camera"
+                size={80}
+                color="white"
+                style={styles.cameraIcon}
+              />
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
       )}
-      <Modal
-        style={{ justifyContent: "center", alignItems: "center" }}
-        isVisible={isModalVisible}
-      >
-        <View
-          style={{
-            backgroundColor: "white",
-            borderRadius: 10,
-            padding: 20,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              marginBottom: 10,
-              textAlign: "center",
-            }}
-          >
-            상위 3개 진단 결과
-          </Text>
-          <View style={{ borderBottomColor: "black", borderBottomWidth: 1 }} />
-          <Text
-            style={{
-              textAlign: "center",
-              padding: 10,
-              fontSize: 18,
-              marginBottom: 20,
-            }}
-          >
-            {diagnosisResult}
-          </Text>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#ccc",
-              padding: 10,
-              marginLeft: 60,
-              marginRight: 60,
-              borderRadius: 10,
-            }}
-            onPress={() => {
-              setModalVisible(false);
-              navigation.replace("HomePage");
-            }}
-          >
-            <Text style={{ fontSize: 16, textAlign: "center", color: "white" }}>
-              확인
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  cameraContainer: {
+    flex: 0.8,
+    width: "100%",
+  },
+  camera: {
+    flex: 1,
+    backgroundColor: "transparent",
+    flexDirection: "row",
+    borderRadius: 10,
+  },
+  cameraButton: {
+    flex: 1,
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  squareOverlay: {
+    position: "absolute",
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: "white",
+    borderRadius: 200,
+    transform: [{ translateX: -50 }, { translateY: -100 }],
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  squareInnerOverlay: {
+    width: "80%",
+    height: "80%",
+    backgroundColor: "transparent",
+    borderStyle: "dashed",
+    borderWidth: 2,
+    borderRadius: 200,
+    borderColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  titleText: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  bottomView: {
+    position: "absolute",
+    width: "100%",
+    height: "30%",
+    bottom: 0,
+    backgroundColor: "#ccc",
+    alignItems: "center",
+    justifyContent: "center",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  cameraIcon: {
+    paddingTop: 80,
+    marginBottom: 10,
+    alignSelf: "center",
+  },
+  modalContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  modalView: {
+    width: "70%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 16,
+    alignItems: "center",
+  },
+  buttonContainer: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+  },
+  button: {
+    width: "40%",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+});

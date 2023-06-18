@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ProJ3",
+    "name": "WITH PET",
     "slug": "ProJ3",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,16 +13,25 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
+      "bundleIdentifier": "com.hoseo.graduateProject",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.hoseo.graduateProject",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e0c15134-0695-4656-9cc3-0d7fabd8d0b7"
+      }
     }
   }
 }

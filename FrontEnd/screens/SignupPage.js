@@ -5,9 +5,14 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import axios from "axios";
 import { API_URL } from "../utils/common";
+
+const { width, height } = Dimensions.get("window");
+const ratioWidth = width / 390; // 390은 원래 코드에서 사용한 기준 너비입니다.
+const ratioHeight = height / 844; // 844는 원래 코드에서 사용한 기준 높이입니다.
 
 const SignUpPage = ({ navigation }) => {
   const [id, setId] = useState("");
@@ -103,20 +108,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 30,
+    marginBottom: 30 * ratioHeight,
   },
   input: {
     width: "80%",
-    height: 50,
+    height: 50 * ratioHeight,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
-    marginBottom: 20,
+    marginBottom: 20 * ratioHeight,
   },
   button: {
     width: "80%",
-    height: 50,
+    height: 50 * ratioHeight,
     backgroundColor: "#007AFF",
     borderRadius: 5,
     alignItems: "center",
