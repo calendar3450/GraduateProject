@@ -86,7 +86,7 @@ export default function GuidePage({ navigation }) {
       marginTop: -200,
       marginRight: 40,
       }}>
-        3. 촬영이 완료되면 AI가{"\n"}이미지를 분석해 {"\n"}체크 결과를 보여 드려요
+        3. 촬영이 완료되면 AI가{"\n"}이미지를 분석해 {"\n"}체크 결과를 보여 드려요.
       </Text>
 
     </View>
