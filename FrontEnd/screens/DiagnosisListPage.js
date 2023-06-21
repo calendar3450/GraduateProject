@@ -8,6 +8,12 @@ export default function DiagnosisListPage({ navigation }) {
   const [diagnosisList, setDiagnosisList] = useState([]);
   const [error, setError] = useState(null);
 
+  const options = {
+    timeZone: "Asia/Seoul",
+    dateStyle: "short",
+    timeStyle: "short",
+  };
+
   useEffect(() => {
     // 페이지가 마운트될 때 진단 목록을 가져오기 위해 호출
     postDiagnosisList();
@@ -60,8 +66,15 @@ export default function DiagnosisListPage({ navigation }) {
         <Text style={styles.subtitle}>종: {item.breed}</Text>
         <Text style={styles.subtitle}>나이: {item.age}</Text>
         <Text style={styles.subtitle}>성별: {item.gender}</Text>
+        <Text style={styles.subtitle}>눈의 위치: {item.eyePosition}</Text>
+        <Text style={styles.subtitle}>
+          진단 시간: {new Date(item.createdAt).toLocaleString("ko-KR", options)}
+        </Text>
         {item.diagnosisResult && (
-          <Text style={styles.subtitle}>진단 결과: {item.diagnosisResult}</Text>
+          <Text style={styles.subtitle}>
+            진단 결과:{" "}
+            {item.diagnosisResult.replace(/([^:,]+):([^,]+)/g, "$1 $2%")}
+          </Text>
         )}
       </View>
     );
