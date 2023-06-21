@@ -9,7 +9,6 @@ import {
   ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'Pet' })
@@ -38,6 +37,10 @@ export class Pet {
   @Column({ type: 'varchar', nullable: false })
   breed: string;
 
+  @ApiProperty()
+  @Column({ type: 'varchar', nullable: false })
+  eyePosition: string;
+
   @ApiProperty({
     example: 5,
     description: '반려견 나이',
@@ -58,14 +61,11 @@ export class Pet {
   @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
   @ApiProperty({
     example: '홍길동',
   })
   @ManyToOne(() => User, (user) => user.userName)
-  @JoinColumn({ name: 'userName' })
+  @JoinColumn({ name: 'author' })
   author: User;
 }
 
