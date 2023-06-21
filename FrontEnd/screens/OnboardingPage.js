@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -32,7 +33,7 @@ export default function OnboardingPage({ navigation }) {
         const decodedToken = jwtDecode(refresh_token);
         const currentTime = Date.now() / 1000;
         if (decodedToken.exp < currentTime) {
-          alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+          Alert.alert("실패", "세션이 만료되었습니다. 다시 로그인해주세요.");
           await AsyncStorage.clear();
           navigation.navigate("LoginPage");
         } else {

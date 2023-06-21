@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   View,
   TextInput,
   StyleSheet,
@@ -38,7 +39,10 @@ export default function LoginPage({ navigation }) {
       // 아이디 또는 비밀번호가 정규식과 일치하지 않을 경우
       setUserId("");
       setPassword("");
-      alert("아이디와 비밀번호는 영어 대소문자와 숫자, 4~16자리만 가능합니다.");
+      Alert.alert(
+        "실패",
+        "아이디와 비밀번호는 영어 대소문자와 숫자, 4~16자리만 가능합니다."
+      );
       return;
     }
 
@@ -98,12 +102,6 @@ export default function LoginPage({ navigation }) {
         onPress={() => navigation.navigate("SignupPage")}
       >
         <Text style={styles.buttonText}>회원가입</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("NoneMemberPage")}
-      >
-        <Text style={styles.buttonText}>비회원</Text>
       </TouchableOpacity>
     </View>
   );

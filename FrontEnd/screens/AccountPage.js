@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   View,
   Text,
   TextInput,
@@ -51,13 +52,16 @@ export default function AccountPage({ navigation }) {
       }
     } else {
       // 토큰이 없을 경우 에러 메시지를 표시하고 로그인 페이지로 이동
-      alert("시스템 오류 다시 로그인해주시기 바랍니다.");
+      Alert.alert(
+        "Error",
+        "시스템 오류 다시 비밀번호를 입력해 주시기 바랍니다."
+      );
       navigation.replace("LoginPage");
     }
 
     try {
       // 사용자 계정 삭제를 위해 서버 API 호출
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/user/deleteUser`,
         {
           password,
@@ -68,13 +72,19 @@ export default function AccountPage({ navigation }) {
           },
         }
       );
-      const result = response.data.data;
       await AsyncStorage.clear(); // AsyncStorage를 비움 (저장된 데이터 삭제)
       navigation.navigate("OnboardingPage"); // Onboarding 페이지로 이동
     } catch (error) {
       console.log(error);
-      alert("아이디 또는 비밀번호가 틀렸습니다.");
+      Alert.alert("", "아이디 또는 비밀번호가 틀렸습니다.");
     }
+  };
+
+  const showAlert = () => {
+    Alert.alert("정말로 탈퇴하시겠습니까?", "예 아니오 버튼을 누르시오", [
+      { text: "아니오", style: "cancel" },
+      { text: "예", onPress: () => handleWithdrawal() },
+    ]);
   };
 
   return (
@@ -90,7 +100,7 @@ export default function AccountPage({ navigation }) {
         value={password}
         onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.button} onPress={handleWithdrawal}>
+      <TouchableOpacity style={styles.button} onPress={showAlert}>
         <Text style={styles.buttonText}>회원 탈퇴</Text>
       </TouchableOpacity>
     </View>

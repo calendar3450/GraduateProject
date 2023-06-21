@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import {
+  Alert,
   StyleSheet,
+  KeyboardAvoidingView,
   View,
   Text,
   TextInput,
@@ -10,8 +12,7 @@ import {
 import axios from "axios";
 import { API_URL } from "../utils/common";
 
-const { width, height } = Dimensions.get("window");
-const ratioWidth = width / 390; // 390은 원래 코드에서 사용한 기준 너비입니다.
+const { height } = Dimensions.get("window");
 const ratioHeight = height / 844; // 844는 원래 코드에서 사용한 기준 높이입니다.
 
 const SignUpPage = ({ navigation }) => {
@@ -35,7 +36,10 @@ const SignUpPage = ({ navigation }) => {
       setId("");
       setPassword("");
       setConfirmPassword("");
-      alert("아이디와 비밀번호는 영어 대소문자와 숫자, 4~16자리만 가능합니다.");
+      Alert.alert(
+        "실패",
+        "아이디와 비밀번호는 영어 대소문자와 숫자, 4~16자리만 가능합니다."
+      );
       return;
     }
     // 회원가입 처리
@@ -45,7 +49,6 @@ const SignUpPage = ({ navigation }) => {
         userName: `${userName}`,
         password: `${password}`,
       });
-      alert("회원가입 성공!!");
       setId("");
       setPassword("");
       setUsername("");
@@ -57,44 +60,46 @@ const SignUpPage = ({ navigation }) => {
       setUsername("");
       setConfirmPassword("");
       console.log(error.response.data);
-      alert("회원가입이 실패하였습니다.");
+      Alert.alert("실패", "회원가입이 실패하였습니다.");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="ID"
-        autoCapitalize="none"
-        onChangeText={(value) => setId(value)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="UserName"
-        autoCapitalize="none"
-        onChangeText={(value) => setUsername(value)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry={true}
-        onChangeText={(value) => setPassword(value)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        secureTextEntry={true}
-        onChangeText={(value) => setConfirmPassword(value)}
-      />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleSignUp(id, userName, password)}
-      >
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Sign Up</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="ID"
+          autoCapitalize="none"
+          onChangeText={(value) => setId(value)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="UserName"
+          autoCapitalize="none"
+          onChangeText={(value) => setUsername(value)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry={true}
+          onChangeText={(value) => setPassword(value)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          secureTextEntry={true}
+          onChangeText={(value) => setConfirmPassword(value)}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleSignUp(id, userName, password)}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -122,7 +127,7 @@ const styles = StyleSheet.create({
   button: {
     width: "80%",
     height: 50 * ratioHeight,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#7c7bad",
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
