@@ -47,6 +47,8 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: { defaultModelsExpandDepth: -1 },
   });
-  await app.listen(3000);
+
+  const PORT = process.env.PORT;
+  await app.listen(PORT);
 }
 bootstrap();
