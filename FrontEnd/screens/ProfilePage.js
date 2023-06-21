@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
@@ -20,7 +21,6 @@ export default function ProfilePage({ navigation }) {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       // 홈 페이지가 포커스를 받았을 때 데이터를 업데이트
-      loadUserName();
       checkTokenExpiration();
     });
 
@@ -30,14 +30,25 @@ export default function ProfilePage({ navigation }) {
   //token 기간만료 체크 함수
   const checkTokenExpiration = async () => {
     const tokens = await AsyncStorage.getItem("tokens");
-    const { refresh_token } = JSON.parse(tokens);
-    if (refresh_token) {
-      const decodedToken = jwtDecode(refresh_token);
-      const currentTime = Date.now() / 1000;
-      if (decodedToken.exp < currentTime) {
-        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-        await AsyncStorage.clear();
-        navigation.replace("LoginPage");
+    if (tokens == null) {
+      Alert.alert("로그인된 기록이 없습니다.", "다시 로그인해주세요.");
+      await AsyncStorage.clear();
+      navigation.replace("LoginPage");
+    } else {
+      const { refresh_token } = JSON.parse(tokens);
+      if (refresh_token) {
+        const decodedToken = jwtDecode(refresh_token);
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp < currentTime) {
+          Alert.alert(
+            "로그인 기한 만료",
+            "토큰에 기한이 만료되었습니다. 다시 로그인해주세요."
+          );
+          await AsyncStorage.clear();
+          navigation.replace("LoginPage");
+        } else {
+          loadUserName();
+        }
       }
     }
   };
@@ -48,7 +59,7 @@ export default function ProfilePage({ navigation }) {
     if (storedUserName) {
       setUserName(JSON.parse(storedUserName).userName);
     } else {
-      alert("로그인이 필요합니다");
+      Alert.alert("실패", "로그인이 필요합니다");
       navigation.replace("LoginPage");
     }
   };
