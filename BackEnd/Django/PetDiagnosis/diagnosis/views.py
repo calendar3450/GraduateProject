@@ -81,14 +81,12 @@ def predict_dog_disease_top3(img):
     df = pd.DataFrame({'pred':prediction[0]})
     df = df.sort_values(by='pred', ascending=False, na_position='first')
 
-    top3_result = []
+    top3_result = {}
     for i in range(3):
         for x in class_dictionary:
             if class_dictionary[x] == (df[df == df.iloc[i]].index[i]):
-                top3_result.append(x)
+                probability = df.iloc[i].pred * 100  # Convert probability to percentage
+                top3_result[x] = f"{probability:.2f}"
                 break
-    # 배열 요소를 형식에 맞게 변환하여 새로운 배열 생성
-    formatted_array = [f"{index+1}. {item}" for index, item in enumerate(top3_result)]
-    # 배열을 문자열로 변환
-    formatted_string = " ".join(formatted_array)
-    return formatted_string
+
+    return top3_result
