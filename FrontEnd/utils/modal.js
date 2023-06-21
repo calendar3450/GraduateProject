@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  Modal,
-  View,
-  Pressable,
-  Text,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { StyleSheet, Modal, View, Pressable, Text } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 function UploadModeModal({
   visible,
@@ -14,55 +7,45 @@ function UploadModeModal({
   onLaunchCamera,
   onLaunchImageLibrary,
 }) {
-  const handleModalOutsidePress = () => {
-    // 모달 외부 터치 시 아무 작업도 수행하지 않음
-  };
   return (
-    <TouchableWithoutFeedback onPress={handleModalOutsidePress}>
-      <Modal
-        visible={visible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={onClose}
-      >
-        <Pressable style={styles.background}>
-          <View style={styles.whiteBox}>
-            <Pressable
-              style={styles.actionButton}
-              android_ripple={{ color: "#eee" }}
-              onPress={() => {
-                onLaunchCamera();
-                onClose();
-              }}
-            >
-              <Icon
-                name="camera-alt"
-                color="#757575"
-                size={24}
-                style={styles.icon}
-              />
-              <Text style={styles.actionText}>카메라로 촬영하기</Text>
-            </Pressable>
-            <Pressable
-              style={styles.actionButton}
-              android_ripple={{ color: "#eee" }}
-              onPress={() => {
-                onLaunchImageLibrary();
-                onClose();
-              }}
-            >
-              <Icon
-                name="photo"
-                color="#757575"
-                size={24}
-                style={styles.icon}
-              />
-              <Text style={styles.actionText}>사진 선택하기</Text>
-            </Pressable>
-          </View>
-        </Pressable>
-      </Modal>
-    </TouchableWithoutFeedback>
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <Pressable style={styles.background} onPress={onClose}>
+        <View style={styles.whiteBox}>
+          <Pressable
+            style={styles.actionButton}
+            android_ripple={{ color: "#eee" }}
+            onPress={() => {
+              onLaunchCamera();
+              onClose();
+            }}
+          >
+            <Icon
+              name="camera-alt"
+              color="#757575"
+              size={24}
+              style={styles.icon}
+            />
+            <Text style={styles.actionText}>카메라로 촬영하기</Text>
+          </Pressable>
+          <Pressable
+            style={styles.actionButton}
+            android_ripple={{ color: "#eee" }}
+            onPress={() => {
+              onLaunchImageLibrary();
+              onClose();
+            }}
+          >
+            <Icon name="photo" color="#757575" size={24} style={styles.icon} />
+            <Text style={styles.actionText}>사진 선택하기</Text>
+          </Pressable>
+        </View>
+      </Pressable>
+    </Modal>
   );
 }
 
