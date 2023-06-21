@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Param,
-  Delete,
   UseInterceptors,
   UseFilters,
   UseGuards,
@@ -25,6 +24,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtRefreshAuthGuard } from 'src/auth/jwt/refreshtoken.guard';
+import { JwtAuthGuard } from 'src/auth/jwt/accesstoken.guard';
+import { CurrentUser } from 'src/common/decorator/custom.decorator';
+import { User } from '../entities/user.entity';
 
 @Controller('user')
 @ApiTags('User')
@@ -129,9 +131,19 @@ export class UserController {
     return this.userService.userUpdate(updateUserDto);
   }
 
-  @ApiOperation({ summary: 'DB 특정 값 삭제하기' })
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @ApiOperation({ summary: '유저 회원 탈퇴' })
+  @ApiBearerAuth('token')
+  @ApiResponse({
+    status: 500,
+    description: 'Server error...',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'success: true',
+  })
+  @Post('deleteUser')
+  @UseGuards(JwtAuthGuard)
+  remove(@CurrentUser() user: User, @Body() password: string) {
+    return this.userService.remove(user.userId, password);
   }
 }

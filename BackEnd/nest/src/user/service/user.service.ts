@@ -9,11 +9,15 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { User } from '../entities/user.entity';
+import { Diagnosis, Pet } from 'src/diagnosis/entities/diagnosis.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Pet) private petRepository: Repository<Pet>,
+    @InjectRepository(Diagnosis)
+    private diagnosisRepository: Repository<Diagnosis>,
   ) {}
 
   async signUp(createUserDto: CreateUserDto) {
@@ -70,8 +74,41 @@ export class UserService {
     await this.userRepository.update({ userId: userId }, { userName });
   }
 
-  remove(userId: string) {
-    return this.userRepository.delete({ userId: userId });
+  async remove(userId: string, body) {
+    const user = await this.userRepository.findOne({ where: { userId } });
+
+    const { password } = body;
+
+    const userName = user.userName;
+
+    if (!user) {
+      throw new UnauthorizedException('Object_id가 존재하지 않습니다');
+    }
+
+    const checkPassword: boolean = await bcrypt.compare(
+      password,
+      user.password,
+    );
+
+    if (!checkPassword) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다');
+    }
+
+    const pets = await this.petRepository.find({
+      where: { author: { userName } },
+    });
+
+    const petIds = pets.map((pet) => pet.petId);
+
+    await Promise.all(
+      petIds.map((petId) =>
+        this.diagnosisRepository.delete({ petId: { petId } }),
+      ),
+    );
+
+    await this.petRepository.delete({ author: { userName } });
+
+    await this.userRepository.delete({ userId: userId });
   }
 
   async updateByToken(userId: string, token: string) {

@@ -5,11 +5,12 @@ import { UserController } from './controller/user.controller';
 import { User } from './entities/user.entity';
 import { UserService } from './service/user.service';
 import { ConfigModule } from '@nestjs/config';
+import { Diagnosis, Pet } from 'src/diagnosis/entities/diagnosis.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Pet, Diagnosis]),
     forwardRef(() => AuthModule),
   ],
   controllers: [UserController],
