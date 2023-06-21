@@ -62,11 +62,12 @@ export class DiagnosisService {
   }
 
   async savePetData(author: any, body: CreatePetDataDto) {
-    const { petName, breed, age, gender } = body;
+    const { petName, breed, age, gender, eyePosition } = body;
 
     const petData = await this.petRepository.save({
       petName,
       breed,
+      eyePosition,
       age,
       gender,
       author,
@@ -77,19 +78,6 @@ export class DiagnosisService {
   }
 
   async savedUrlAndDiagnosis(_id: InputPetIdDto, url: string) {
-    const { petId } = _id;
-    await this.diagnosisRepository.save({ petId });
-    const saved = await this.diagnosisRepository.update(
-      {
-        petId: petId,
-      },
-      { imgUrl: url },
-    );
-
-    if (saved.affected == 0) {
-      throw new BadRequestException('해당하는 펫 아이디를 찾을 수 없습니다.');
-    }
-
     const data = {
       img: url,
     };
@@ -99,13 +87,31 @@ export class DiagnosisService {
     const res = axios
       .post(djangoUrl, data)
       .then(async (response) => {
-        await this.diagnosisRepository.update(
-          {
-            petId: petId,
-          },
-          { diagnosis: response.data.result },
+        const { petId } = _id;
+        const imgUrl = url;
+        const isExistPetid = await this.diagnosisRepository.findOne({
+          where: { petId },
+        });
+        const formattedString = JSON.stringify(response.data.result).replace(
+          /\"|\{|\}/g,
+          '',
         );
-        return response.data;
+        if (isExistPetid) {
+          await this.diagnosisRepository.update(
+            {
+              petId: petId,
+            },
+            { diagnosis: formattedString },
+          );
+          return response.data;
+        } else {
+          await this.diagnosisRepository.save({
+            petId,
+            diagnosis: formattedString,
+            imgUrl,
+          });
+          return response.data;
+        }
       })
       .catch((error) => {
         const errorMessage = error.message;
