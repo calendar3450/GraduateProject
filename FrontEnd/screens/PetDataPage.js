@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import {
   View,
   Text,
+  Keyboard,
   TextInput,
   StyleSheet,
   Alert,
   TouchableOpacity,
   Dimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
 import { API_URL } from "../utils/common";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 const ratioHeight = height / 844; // 844는 원래 코드에서 사용한 기준 높이입니다.
 
 export default function PetDataPage({ navigation }) {
@@ -21,6 +23,7 @@ export default function PetDataPage({ navigation }) {
   const [breed, setBreed] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
+  const [eyePosition, setEyePosition] = useState("");
 
   const handleCreatePet = async () => {
     const tokens = await AsyncStorage.getItem("tokens");
@@ -62,6 +65,7 @@ export default function PetDataPage({ navigation }) {
           petName: `${petName}`,
           breed: `${breed}`,
           age: parseInt(age),
+          eyePosition: `${eyePosition}눈`,
           gender: `${gender}`,
         },
         {
@@ -88,53 +92,84 @@ export default function PetDataPage({ navigation }) {
     setGender(selected);
   };
 
+  const handleEyePositionSelect = (selected) => {
+    setEyePosition(selected);
+  };
+
+  const handlePress = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.greeting}>
-        진단할 반려견의 정보를 입력하여주세요!
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="펫이름"
-        value={petName}
-        onChangeText={setPetName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="견종"
-        value={breed}
-        onChangeText={setBreed}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="나이"
-        value={age}
-        onChangeText={setAge}
-      />
-      <View style={styles.genderContainer}>
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            gender === "수컷" ? styles.genderButtonSelected : null,
-          ]}
-          onPress={() => handleGenderSelect("수컷")}
-        >
-          <Text style={styles.genderButtonText}>수컷</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            gender === "암컷" ? styles.genderButtonSelected : null,
-          ]}
-          onPress={() => handleGenderSelect("암컷")}
-        >
-          <Text style={styles.genderButtonText}>암컷</Text>
+    <TouchableWithoutFeedback onPress={handlePress}>
+      <View style={styles.container}>
+        <Text style={styles.greeting}>
+          진단할 반려견의 정보를 입력하여주세요!
+        </Text>
+        <TextInput
+          style={styles.input}
+          placeholder="펫이름"
+          value={petName}
+          onChangeText={setPetName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="견종"
+          value={breed}
+          onChangeText={setBreed}
+        />
+        <TextInput
+          keyboardType="number-pad"
+          style={styles.input}
+          placeholder="나이"
+          value={age}
+          onChangeText={setAge}
+        />
+        <View style={styles.selectContainer}>
+          <TouchableOpacity
+            style={[
+              styles.selectButton,
+              gender === "수컷" ? styles.ButtonSelected : null,
+            ]}
+            onPress={() => handleGenderSelect("수컷")}
+          >
+            <Text style={styles.selectButtonText}>수컷</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.selectButton,
+              gender === "암컷" ? styles.ButtonSelected : null,
+            ]}
+            onPress={() => handleGenderSelect("암컷")}
+          >
+            <Text style={styles.selectButtonText}>암컷</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.selectContainer}>
+          <TouchableOpacity
+            style={[
+              styles.selectButton,
+              eyePosition === "왼쪽" ? styles.ButtonSelected : null,
+            ]}
+            onPress={() => handleEyePositionSelect("왼쪽")}
+          >
+            <Text style={styles.selectButtonText}>왼쪽눈</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.selectButton,
+              eyePosition === "오른쪽" ? styles.ButtonSelected : null,
+            ]}
+            onPress={() => handleEyePositionSelect("오른쪽")}
+          >
+            <Text style={styles.selectButtonText}>오른쪽눈</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleCreatePet}>
+          <Text style={styles.buttonText}>반려동물 정보 등록하기</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={[styles.button]} onPress={handleCreatePet}>
-        <Text style={styles.buttonText}>반려동물 정보 등록하기</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -175,25 +210,24 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10 * ratioHeight,
   },
-  genderContainer: {
+  selectContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 5,
   },
-  genderButton: {
+  selectButton: {
     flex: 1,
     padding: 20,
     margin: 10,
     borderRadius: 10,
     backgroundColor: "#ccc",
   },
-  genderButtonText: {
+  selectButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
   },
-  genderButtonSelected: {
+  ButtonSelected: {
     backgroundColor: "#7c7bad",
   },
 });
