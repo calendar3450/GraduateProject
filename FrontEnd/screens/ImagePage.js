@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
+  Alert,
   Platform,
   ActionSheetIOS,
   Text,
@@ -23,20 +24,13 @@ export default function ImageInputPage({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
-  const [diagnosisResult, setDiagnosisResult] = useState("");
   const [hasCameraPermission, setCameraPermission] = useState(null);
   const [camera, setCamera] = useState(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  const previewRef = useRef(null);
 
   const windowWidth = Dimensions.get("window").width;
   const windowHeight = Dimensions.get("window").height;
-
-  const squareWidth = windowWidth * 0.7;
-  const squareHeight = windowHeight * 0.3;
-  const squareTop = windowHeight * 0.3;
-  const squareLeft = windowWidth * 0.3;
 
   useEffect(() => {
     const requestCameraPermission = async () => {
@@ -90,7 +84,7 @@ export default function ImageInputPage({ navigation }) {
     }
 
     const cropWidth = photo.width / 2; // 크롭 영역의 너비
-    const cropHeight = photo.height / 2; // 크롭 영역의 높이
+    const cropHeight = photo.height / 2.5; // 크롭 영역의 높이
 
     const originX = Math.max((photo.width - cropWidth) / 2, 0);
     const originY = Math.max((photo.height - cropHeight) / 2, 0);
@@ -100,7 +94,7 @@ export default function ImageInputPage({ navigation }) {
       originY + cropHeight > photo.height
     ) {
       console.log("크롭 영역이 원본 이미지를 벗어납니다.");
-      return; // 크롭 영역이 원본 이미지를 벗어나는 경우 처리
+      return photo; // 크롭 영역이 원본 이미지를 벗어나는 경우 처리
     }
 
     const croppedImage = await manipulateAsync(
@@ -142,19 +136,17 @@ export default function ImageInputPage({ navigation }) {
     if (!result.canceled) {
       setImage(result);
       uploadImage(result);
+      setCameraModalVisible(false);
     }
   };
 
   const uploadImage = async (photo) => {
     setIsLoading(true);
 
-    console.log(`크롭된 이미지: ${croppedImg.width}`);
-
     const petId = await AsyncStorage.getItem("petId");
     let obj_petId;
     if (petId !== null) {
       obj_petId = JSON.parse(petId);
-      console.log(obj_petId);
     } else {
       console.log("petId not found");
     }
@@ -162,7 +154,7 @@ export default function ImageInputPage({ navigation }) {
     let formData = new FormData();
 
     formData.append("image", {
-      uri: croppedImg.uri,
+      uri: photo.uri,
       type: "multipart/form-data",
       name: "image_test",
     });
@@ -182,15 +174,14 @@ export default function ImageInputPage({ navigation }) {
           },
         }
       );
-
       setIsLoading(false);
-      setDiagnosisResult(response.data.data.result);
       const passedData = response.data.data.result;
       navigation.replace("DiagnosisResultPage", { result: passedData });
     } catch (error) {
       setIsLoading(false);
       console.log(error.response.data);
-      alert(
+      Alert.alert(
+        "진단 실패",
         "진단에 실패하였습니다. 펫 정보를 다시 입력한 후 진단을 시작하세요!"
       );
     }
