@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
+  Alert,
   Platform,
   ActionSheetIOS,
   Text,
@@ -10,9 +11,8 @@ import {
   Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { API_URL } from "../utils/common";
+import { Django_API_URL } from "../utils/common";
 import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import UploadModeModal from "../utils/modal";
@@ -34,12 +34,10 @@ export default function NoneMemberPage({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
-  const [diagnosisResult, setDiagnosisResult] = useState("");
   const [hasCameraPermission, setCameraPermission] = useState(null);
   const [camera, setCamera] = useState(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  const previewRef = useRef(null);
 
   useEffect(() => {
     const requestCameraPermission = async () => {
@@ -92,7 +90,7 @@ export default function NoneMemberPage({ navigation }) {
     }
 
     const cropWidth = photo.width / 2; // 크롭 영역의 너비
-    const cropHeight = photo.height / 2; // 크롭 영역의 높이
+    const cropHeight = photo.height / 2.5; // 크롭 영역의 높이
 
     const originX = Math.max((photo.width - cropWidth) / 2, 0);
     const originY = Math.max((photo.height - cropHeight) / 2, 0);
@@ -127,7 +125,8 @@ export default function NoneMemberPage({ navigation }) {
       const photo = await camera.takePictureAsync();
       console.log("사진의 크기:", photo.width, "x", photo.height);
       setImage(photo);
-      uploadImage(photo);
+      const croppedImg = await cropImage(photo);
+      uploadImage(croppedImg);
     }
   };
 
@@ -141,20 +140,19 @@ export default function NoneMemberPage({ navigation }) {
     });
 
     if (!result.canceled) {
-      setImage(result.uri);
-      uploadImage(result.uri);
+      setImage(result);
+      uploadImage(result);
+      setCameraModalVisible(false);
     }
   };
 
   const uploadImage = async (photo) => {
     setIsLoading(true); // 통신 시작 시 로딩 화면 활성화
 
-    const croppedImg = await cropImage(photo);
-
     let formData = new FormData();
 
     formData.append("img", {
-      uri: croppedImg.uri,
+      uri: photo.uri,
       type: "multipart/form-data",
       name: "image_test",
     });
@@ -175,11 +173,11 @@ export default function NoneMemberPage({ navigation }) {
       );
 
       setIsLoading(false);
-      setDiagnosisResult(response.data.result);
-      navigation.navigate("DiagnosisResultPage");
+      const passedData = response.data.data.result;
+      navigation.replace("DiagnosisResultPage", { result: passedData });
     } catch (error) {
       setIsLoading(false);
-      alert("진단에 실패하였습니다 다시 시도해주세요!");
+      Alert.alert("진단 실패", "진단에 실패하였습니다 다시 시도해주세요!");
     }
   };
 
