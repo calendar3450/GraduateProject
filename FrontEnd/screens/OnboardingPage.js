@@ -54,7 +54,7 @@ export default function OnboardingPage({ navigation }) {
   };
 
   const handleGuidePage = () => {
-    //프로필 페이지 이동
+    //가이드 페이지 이동
     navigation.navigate("GuidePage");
   };
 
@@ -202,6 +202,7 @@ export default function OnboardingPage({ navigation }) {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.flatListContainer}
+        scrollEnabled={false}
       />
     </View>
   );

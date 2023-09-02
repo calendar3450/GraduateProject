@@ -99,7 +99,6 @@ export default function NoneMemberPage({ navigation }) {
       originX + cropWidth > photo.width ||
       originY + cropHeight > photo.height
     ) {
-      console.log("크롭 영역이 원본 이미지를 벗어납니다.");
       return; // 크롭 영역이 원본 이미지를 벗어나는 경우 처리
     }
 
@@ -123,7 +122,6 @@ export default function NoneMemberPage({ navigation }) {
   const takePicture = async () => {
     if (camera && isCameraReady) {
       const photo = await camera.takePictureAsync();
-      console.log("사진의 크기:", photo.width, "x", photo.height);
       setImage(photo);
       const croppedImg = await cropImage(photo);
       uploadImage(croppedImg);
@@ -173,11 +171,13 @@ export default function NoneMemberPage({ navigation }) {
       );
 
       setIsLoading(false);
-      const passedData = response.data.data.result;
+      const passedData = response.data.result;
       navigation.replace("DiagnosisResultPage", { result: passedData });
     } catch (error) {
       setIsLoading(false);
-      Alert.alert("진단 실패", "진단에 실패하였습니다 다시 시도해주세요!");
+      Alert.alert("진단 실패", "진단에 실패하였습니다 다시 시도해주세요!", [
+        { text: "Ok", onPress: () => navigation.pop() },
+      ]);
     }
   };
 
