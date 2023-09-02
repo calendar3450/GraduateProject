@@ -117,7 +117,6 @@ export default function ImageInputPage({ navigation }) {
   const takePicture = async () => {
     if (camera && isCameraReady) {
       const photo = await camera.takePictureAsync();
-      console.log("사진의 크기:", photo.width, "x", photo.height);
       setImage(photo);
       const croppedImg = await cropImage(photo);
       uploadImage(croppedImg);
@@ -182,7 +181,8 @@ export default function ImageInputPage({ navigation }) {
       console.log(error.response.data);
       Alert.alert(
         "진단 실패",
-        "진단에 실패하였습니다. 펫 정보를 다시 입력한 후 진단을 시작하세요!"
+        "진단에 실패하였습니다. 펫 정보를 다시 입력한 후 진단을 시작하세요!",
+        [{ text: "Ok", onPress: () => navigation.replace("PetDataPage") }]
       );
     }
   };
@@ -238,8 +238,8 @@ export default function ImageInputPage({ navigation }) {
         <UploadModeModal
           visible={cameraModalVisible}
           onClose={() => setCameraModalVisible(false)}
-          onLaunchCamera={startCamera}
-          onLaunchImageLibrary={pickImage}
+          onLaunchCamera={() => startCamera()}
+          onLaunchImageLibrary={() => pickImage()}
         />
       )}
 
