@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dtos/create-user.dto';
-import { UpdateUserDto } from '../dtos/update-user.dto';
 import { User } from '../entities/user.entity';
 import { Diagnosis, Pet } from 'src/diagnosis/entities/diagnosis.entity';
 
@@ -23,7 +22,7 @@ export class UserService {
   async signUp(createUserDto: CreateUserDto) {
     const { userId, userName, password } = createUserDto;
 
-    const isEmailExists = await this.userRepository.findOne({
+    const isUserIdExists = await this.userRepository.findOne({
       where: { userId },
     });
 
@@ -33,7 +32,7 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    if (isEmailExists != null) {
+    if (isUserIdExists != null) {
       throw new UnauthorizedException('입력한 아이디가 존재합니다.');
     }
 
@@ -48,33 +47,7 @@ export class UserService {
     });
   }
 
-  findAll() {
-    return this.userRepository.find();
-  }
-
-  async findOne(userId: string) {
-    const isUserIdExist = await this.userRepository.findOneBy({ userId });
-    if (isUserIdExist == null) {
-      throw new UnauthorizedException('id가 존재하지 않습니다');
-    }
-    return userId;
-  }
-
-  async userUpdate(updateUserDto: UpdateUserDto) {
-    const { userId, userName } = updateUserDto;
-
-    const isUserNameExists = await this.userRepository.findOne({
-      where: { userName },
-    });
-
-    if (isUserNameExists != null) {
-      throw new UnauthorizedException('입력한 유저명이 존재합니다.');
-    }
-
-    await this.userRepository.update({ userId: userId }, { userName });
-  }
-
-  async remove(userId: string, body) {
+  async remove(userId: string, body: any) {
     const user = await this.userRepository.findOne({ where: { userId } });
 
     const { password } = body;
