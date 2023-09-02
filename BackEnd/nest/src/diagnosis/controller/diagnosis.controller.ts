@@ -90,7 +90,7 @@ export class DiagnosisController {
   })
   @ApiResponse({
     status: 201,
-    description: '회원의 모든 진단결과 반환',
+    description: '회원의 진단한 펫 정보 목록 반환',
     schema: {
       example: {
         success: true,
