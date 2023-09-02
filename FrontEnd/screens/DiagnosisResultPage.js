@@ -51,50 +51,52 @@ export default function DiagnosisResultPage({ navigation, route }) {
     } else {
       // 나머지 항목은 진단 결과를 시각적으로 표현하는 컴포넌트
       const barWidth = `${item.probability / 1.5}%`;
-      return (
-        <View style={styles.blockContainer}>
-          <LinearGradient
-            style={styles.blockGradient}
-            colors={["#7B68EE", "#9370DB"]}
-            start={{ x: 0, y: 1 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.barContainer}>
-              <Text style={styles.barTitle}>{item.title}</Text>
-              <Text style={styles.barPercentage}>{item.probability}%</Text>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: 10 * ratioWidth,
-                marginLeft: 20 * ratioWidth,
-              }}
+      if (item.probability != 0) {
+        return (
+          <View style={styles.blockContainer}>
+            <LinearGradient
+              style={styles.blockGradient}
+              colors={["#7B68EE", "#9370DB"]}
+              start={{ x: 0, y: 1 }}
+              end={{ x: 1, y: 1 }}
             >
+              <View style={styles.barContainer}>
+                <Text style={styles.barTitle}>{item.title}</Text>
+                <Text style={styles.barPercentage}>{item.probability}%</Text>
+              </View>
               <View
                 style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 10 * ratioWidth,
-                  right: 105 * ratioWidth,
-                  bottom: 0,
-                  backgroundColor: "#e6e6e6",
-                  borderRadius: 20 * ratioWidth,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 10 * ratioWidth,
+                  marginLeft: 20 * ratioWidth,
                 }}
-              />
-              <Svg width="100%" height={20 * ratioHeight}>
-                <Rect
-                  width={barWidth}
-                  height={20 * ratioHeight}
-                  rx={10 * ratioWidth}
-                  ry={10 * ratioWidth}
-                  fill="#483D8B"
+              >
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 10 * ratioWidth,
+                    right: 105 * ratioWidth,
+                    bottom: 0,
+                    backgroundColor: "#e6e6e6",
+                    borderRadius: 20 * ratioWidth,
+                  }}
                 />
-              </Svg>
-            </View>
-          </LinearGradient>
-        </View>
-      );
+                <Svg width="100%" height={20 * ratioHeight}>
+                  <Rect
+                    width={barWidth}
+                    height={20 * ratioHeight}
+                    rx={10 * ratioWidth}
+                    ry={10 * ratioWidth}
+                    fill="#483D8B"
+                  />
+                </Svg>
+              </View>
+            </LinearGradient>
+          </View>
+        );
+      }
     }
   };
 
