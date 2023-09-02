@@ -122,10 +122,12 @@ export class DiagnosisService {
   }
 
   async findByUserName(body: any) {
-    const { author } = body;
+    const { author, pageSize, page } = body;
     const findData = await this.petRepository.find({
       where: { author: { userName: author } },
       order: { createdAt: 'DESC' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
     return findData;
   }
