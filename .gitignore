@@ -1,6 +1,9 @@
+#os
 .DS_Store
+# env file
 .env
 # compiled output
-/BackEnd/nest/dist
-/BackEnd/nest/node_modules
+node_modules/
+dist/
+#model
 /BackEnd/Django/PetDiagnosis/test_model.h5
