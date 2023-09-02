@@ -50,7 +50,7 @@ function App() {
         <Stack.Screen
           name="ProfilePage"
           component={ProfilePage}
-          options={{ headerTitle: "홈 화면" }}
+          options={{ headerTitle: "프로필 화면" }}
         />
         <Stack.Screen
           name="LoginPage"
