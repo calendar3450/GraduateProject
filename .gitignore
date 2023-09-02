@@ -6,4 +6,4 @@
 node_modules/
 dist/
 #model
-/BackEnd/Django/PetDiagnosis/test_model.h5
+/BackEnd/Django/PetDiagnosis/diagnosis_model.h5
