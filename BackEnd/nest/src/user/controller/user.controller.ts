@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Param,
   UseInterceptors,
   UseFilters,
   UseGuards,
@@ -14,7 +13,6 @@ import { AuthLoginDto } from 'src/auth/dto/auth.dto';
 import { HttpExceptionFilter } from 'src/common/exceptions/http-exceptions.filter';
 import { SuccessInterceptor } from 'src/common/interceptors/success.interceptor';
 import { CreateUserDto } from '../dtos/create-user.dto';
-import { UpdateUserDto } from '../dtos/update-user.dto';
 import { Request } from 'express';
 import { UserService } from '../service/user.service';
 import {
@@ -98,37 +96,6 @@ export class UserController {
     const token = req.user['refreshToken'];
     const userName = req.user['userName'];
     return await this.authService.validateByRefreshToken(userName, token);
-  }
-
-  @ApiOperation({ summary: 'DB 모든 정보 가져오기' })
-  @Get('all')
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @ApiOperation({ summary: 'DB 특정 값 가져오기' })
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
-  }
-
-  @ApiOperation({ summary: '회원 유저명 수정 API' })
-  @ApiResponse({
-    status: 500,
-    description: 'Server error...',
-  })
-  @ApiResponse({
-    status: 201,
-    description: '성공 여부',
-    schema: {
-      example: {
-        success: true,
-      },
-    },
-  })
-  @Post('userUpdate')
-  userUpdate(@Body() updateUserDto: UpdateUserDto) {
-    return this.userService.userUpdate(updateUserDto);
   }
 
   @ApiOperation({ summary: '유저 회원 탈퇴' })
