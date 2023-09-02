@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View, StyleSheet, Dimensions } from "react-native";
+import {
+  FlatList,
+  Text,
+  View,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { API_URL } from "../utils/common";
 
 export default function DiagnosisListPage({ navigation }) {
   const [diagnosisList, setDiagnosisList] = useState([]);
+  const [dataLength, setDataLength] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [author, setAuthor] = useState("");
   const [error, setError] = useState(null);
+
+  let pageCount = 1;
 
   const options = {
     timeZone: "Asia/Seoul",
@@ -15,30 +27,48 @@ export default function DiagnosisListPage({ navigation }) {
   };
 
   useEffect(() => {
-    // 페이지가 마운트될 때 진단 목록을 가져오기 위해 호출
-    postDiagnosisList();
+    loadUserName();
   }, []);
 
-  const postDiagnosisList = async () => {
-    try {
-      // AsyncStorage에서 userName 가져오기
-      const userName = await AsyncStorage.getItem("userName");
-      let obj_userName;
-      if (userName !== null) {
-        const sub_userName = JSON.parse(userName);
-        obj_userName = sub_userName.userName;
-      } else {
-        console.log("userName not found");
-        navigation.replace("LoginPage");
+  //유저 네임 불러오기
+  const loadUserName = async () => {
+    // AsyncStorage에서 userName 가져오기
+    const userName = await AsyncStorage.getItem("userName");
+    if (userName !== null) {
+      setAuthor(JSON.parse(userName).userName);
+      postPetData(JSON.parse(userName).userName);
+    } else {
+      console.log("userName not found");
+      navigation.replace("LoginPage");
+    }
+  };
+
+  const onEndReached = () => {
+    if (!loading) {
+      if (dataLength > 1 && dataLength % 10 == 0) {
+        pageCount++;
+        postPetData(author);
       }
-      console.log(`userName - ${obj_userName}`);
+    } else {
+      return;
+    }
+  };
 
-      // API 엔드포인트 호출하여 진단 목록 가져오기
-      const response = await axios.post(`${API_URL}/diagnosis/findAllPetData`, {
-        author: obj_userName,
-      });
-      const diagnosisListData = response.data.data;
+  //page에 불러올 데이터 10개 로딩
+  const postPetData = async (userName) => {
+    setLoading(true);
+    // API 엔드포인트 호출하여 진단 목록 가져오기
+    const response = await axios.post(`${API_URL}/diagnosis/findAllPetData`, {
+      author: userName,
+      page: pageCount,
+      pageSize: 10,
+    });
+    setDataLength(response.data.data.length);
+    postDiagnosisList(response.data.data);
+  };
 
+  const postDiagnosisList = async (diagnosisListData) => {
+    try {
       // 각 애완동물에 대한 진단 결과를 가져와 진단 목록 데이터에 추가
       const updatedDiagnosisListData = await Promise.all(
         diagnosisListData.map(async (obj) => {
@@ -52,7 +82,8 @@ export default function DiagnosisListPage({ navigation }) {
         })
       );
       // 업데이트된 진단 목록 데이터 설정
-      setDiagnosisList(updatedDiagnosisListData);
+      setDiagnosisList(diagnosisList.concat(updatedDiagnosisListData));
+      setLoading(false);
     } catch (error) {
       setError("데이터를 불러오지 못 하였습니다.");
     }
@@ -82,10 +113,18 @@ export default function DiagnosisListPage({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {diagnosisList.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>진단 기록이 없습니다</Text>
+        </View>
+      )}
       <FlatList
         data={diagnosisList}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={1}
         renderItem={renderItem}
         keyExtractor={(item) => item.petId}
+        ListFooterComponent={loading && <ActivityIndicator />}
       />
     </View>
   );
@@ -101,6 +140,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20 * ratioWidth,
     paddingVertical: 20 * ratioHeight,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyText: {
+    color: "#7c7bad",
+    fontSize: 32 * ratioWidth,
+    fontWeight: "bold",
+    textAlign: "center",
   },
   item: {
     backgroundColor: "#f9f9f9",
