@@ -1,9 +1,0 @@
-#os
-.DS_Store
-# env file
-.env
-# compiled output
-node_modules/
-dist/
-#model
-/BackEnd/Django/PetDiagnosis/diagnosis_model.h5
