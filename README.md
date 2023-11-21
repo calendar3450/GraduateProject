@@ -1,4 +1,4 @@
-# [ With Pet ] 딥러닝 기반 반려동물 안구 보조 진단 서비스 앱 (Deep learning-based pet eye-assisted diagnostic service application)
+# [ With Pet ] 딥러닝 기반 반려동물 안구 보조 진단 서비스 앱
 
 호서대 컴퓨터공학과 졸업프로젝트입니다.
 
@@ -6,60 +6,49 @@
 
 기획, 개발, 배포한 총 기간은 2023.03.01 ~ 08.25 입니다.
 
-This is graduate project of Hoseo university. 
-
-Participants: Leader: Minsu Kim, Member: Jungki Min, Sanghun Lee, Wonil Jang.
-
-Total period: 23.03.01 ~ 23.08.25
-
-
-## 개발 담당 파트 (Development part)
+## 개발 담당 파트
 
 프론트 개발 담당: 김민수, 민정기, 이상훈
 서버 개발 담당: 김민수, 장원일
 모델 개발: 김민수, 민정기, 장원일
 
-Front End : Minsu Kim, Jungki Min, Sanghun Lee.
-Back End: Minsu Kim, Wonil Jang.
-AI Model: Minsu Kim, Jungki Min, Wonil Jang.
-
-## 개발 일정 (Time period)
+## 개발 일정
 
 <img width="751" alt="스크린샷 2023-09-02 오후 12 12 05" src="https://github.com/Pushedsu/WithPet/assets/109027302/63432547-00b6-4313-b325-f430d4e5cae9">
 <br/>
 
-# ⚙️ 개발 환경 (IDE)
+# ⚙️ 개발 환경
 
-### 에디터(Editor)
+### 에디터
 
 - Visual Studio Code
 - Mysql Workbench
 - JupyterNoteBook
 
-### 앱 디자인 (Application Design)
+### 앱 디자인
 
-- 앱 흐름도 (Flow Chart)
+- 앱 흐름도
   <img width="1164" alt="스크린샷 2023-08-28 오후 2 24 24" src="https://github.com/Pushedsu/WithPet/assets/109027302/6a715812-d707-4a45-83be-e2446b5509a8">
 
-- 앱 구현 화면 
+- 앱 구현 화면
   ![KakaoTalk_Photo_2023-08-29-21-10-37](https://github.com/Pushedsu/WithPet/assets/109027302/012f2d37-762c-4881-8f53-02446a88a3a5)
 
 # 🔨 Tech Skills
 
-## 🖥 백엔드(BackEnd)
+## 🖥 백엔드
 
-### 언어 / 프레임워크 (Language, Framework)
+### 언어 / 프레임워크
 
 - TypeScript
 - NestJs
 - Python
 - Django
 
-### 데이터베이스 (Database)
+### 데이터베이스
 
 - Mysql (TypeORM)
 
-### 인프라 (Infrastructure)
+### 인프라
 
 - AWS Light Sail (Container, DataBase)
 - AWS Route53
@@ -79,14 +68,14 @@ graph TD;
 
 <br/>
 
-## 💻 프론트엔드(FrontEnd)
+## 💻 프론트엔드
 
-### 언어 / 프레임 워크 (Language, FrameWork)
+### 언어 / 프레임 워크
 
 - JavaScript
 - React Native (Expo)
 
-# 🧱 시스템 구조도 (System Diagram)
+# 🧱 시스템 구조도
 
 <img width="717" alt="스크린샷 2023-08-07 오후 8 00 34" src="https://github.com/Pushedsu/WithPet/assets/109027302/9df32088-9934-4538-9178-148a8a77414f">
 
@@ -96,13 +85,13 @@ graph TD;
 
 <br/>
 
-# 🤖 딥러닝 모델 (DeepLearning Model)
+# 🤖 딥러닝 모델
 
 ## 학습 데이터 출처
 
 [AI HUB 반려동물 안구 질환 데이터](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=&topMenu=&aihubDataSe=realm&dataSetSn=562)
 
-## 모델 설계 (How to build model)
+## 모델 설계
 
 CNN 구조를 바탕으로 모델 설계
 
@@ -110,17 +99,11 @@ CNN 구조를 바탕으로 모델 설계
 
 - [안구 진단 딥러닝 모델 테스트 & 설계 과정 ](https://github.com/Pushedsu/Pet-Eye-Diagnosis-Model)
 - [안구 진단 테스트 모델](https://github.com/pek110/pet-diagnosis)
-
-We build model by using CNN.
-
-A dataSet which train the model compose 141,452 images and other dataSet which check the model compose 22,059 images.
-- [Ocular Diagnostic Deep Learning Model Test & Design Process](https://github.com/Pushedsu/Pet-Eye-Diagnosis-Model)
-- [Ocular Diagnostic Test Model](https://github.com/pek110/pet-diagnosis)
   <br/>
 
-# 🚫 개선 및 구현이 필요한 문제들(Problems requiring improvement and implementation)
+# 🚫 개선 및 구현이 필요한 문제들
 
-## 채팅 서비스 미구현(Chat service not implemented)
+## 채팅 서비스 미구현
 
 백엔드에서는 채팅 기능을 구현하였으나 채팅 프론트 개발을 완성하지 않았고 서버에서 구현이 잘 되는지 테스트 또한 해보지 않았습니다.
 
